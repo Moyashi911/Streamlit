@@ -1,12 +1,29 @@
-import streamlit as st
+import time
+import numpy as np
 import pandas as pd
-uploaded_file = st.file_uploader("アクセスログをアップロードしてください。")
-if uploaded_file is not None:
-    df = pd.read_csv(
-        uploaded_file,
-        sep=r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)(?![^\[]*\])',
-        engine='python',
-        na_values='-',
-        header=None)
-st.markdown('### アクセスログ（先頭5件）')
-st.write(df.head(5))
+import streamlit as st
+
+_LOREM_IPSUM = """
+Lorem ipsum dolor sit amet, **consectetur adipiscing** elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+"""
+
+
+def stream_data():
+    for word in _LOREM_IPSUM.split(" "):
+        yield word + " "
+        time.sleep(0.02)
+
+    yield pd.DataFrame(
+        np.random.randn(5, 10),
+        columns=["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+    )
+
+    for word in _LOREM_IPSUM.split(" "):
+        yield word + " "
+        time.sleep(0.02)
+
+
+if st.button("Stream data"):
+    st.write_stream(stream_data)
